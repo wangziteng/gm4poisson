@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="gb2312"?>
+<VisualStudioProject
+	ProjectType="Intel C++ Project"
+	Version="13.0"
+	Name="lib"
+	ProjectGUID="{BA339B36-D48B-4505-8400-1FBC080C40DA}"
+	VCNestedProjectGUID="{A563C0DB-763A-424D-846C-7F9EF6A0CB89}"
+	VCNestedProjectFileName="lib.vcproj"
+	>
+	<Configurations>
+		<Configuration
+			Name="Debug|Win32"
+			>
+			<Tool
+				Name="CppCmplrTool"
+				Parallelization="false"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			>
+			<Tool
+				Name="CppCmplrTool"
+				EnableMatrixMultiplyLibraryCall="2"
+				Parallelization="false"
+			/>
+		</Configuration>
+	</Configurations>
+	<Files/>
+</VisualStudioProject>
