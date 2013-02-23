@@ -1,3 +1,10 @@
+/**
+ * @file multigrid_iteration.c
+ * @brief Different MG cycling including V-cycle, Full-MG, PCG
+ * @author Ziteng Wang
+ * @version 1.0
+ * @date 2013-02-23
+ */
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
@@ -7,6 +14,16 @@
 
 #include "multigrid_functs.h"
 
+
+
+/**
+ * @brief V-cycle for 1D poisson problem
+ *
+ * @param u solution vector
+ * @param b right hand vector
+ * @param level position of first element in each level
+ * @param maxlevel number of maximum level
+ */
 void multigrid_vcycle_1d(REAL *u,
                          REAL *b,
                          INT *level,
@@ -54,6 +71,17 @@ void multigrid_vcycle_1d(REAL *u,
     
 }
 
+
+/**
+ * @brief V-cycle for 2D poisson problem
+ *
+ * @param u solution vector
+ * @param b right hand vector
+ * @param level position of first element in each level
+ * @param maxlevel number of maximum level
+ * @param nx number of grids in x direction
+ * @param ny number of grids in y direction
+ */
 void multigrid_vcycle_2d(REAL *u,
                          REAL *b,
                          INT *level,
@@ -111,6 +139,17 @@ void multigrid_vcycle_2d(REAL *u,
     
 }
 
+/**
+ * @brief V-cycle for 3D poisson problem
+ *
+ * @param u solution vector
+ * @param b right hand vector
+ * @param level position of first element in each level
+ * @param maxlevel number of maximum level
+ * @param nx number of grids in x direction
+ * @param ny number of grids in y direction
+ * @param nz number of grids in z direction
+ */
 void multigrid_vcycle_3d(REAL *u,
                          REAL *b,
                          INT *level,
@@ -169,6 +208,17 @@ void multigrid_vcycle_3d(REAL *u,
     
 }
 
+/**
+ * @brief Full MG for 3D poisson problem
+ *
+ * @param u solution vector
+ * @param b right hand vector
+ * @param level position of first element in each level
+ * @param maxlevel number of maximum level
+ * @param nx number of grids in x direction
+ * @param ny number of grids in y direction
+ * @param nz number of grids in z direction
+ */
 void multigrid_full_3d(REAL *u,
                        REAL *b,
                        INT *level,
@@ -222,6 +272,17 @@ void multigrid_full_3d(REAL *u,
     
 }
 
+/**
+ * @brief PCG for 3D poisson problem
+ *
+ * @param u solution vector
+ * @param b right hand vector
+ * @param level position of first element in each level
+ * @param maxlevel number of maximum level
+ * @param nx number of grids in x direction
+ * @param ny number of grids in y direction
+ * @param nz number of grids in z direction
+ */
 void multigrid_pcg_3d(REAL *u,
                       REAL *b,
                       INT *level,
@@ -269,6 +330,16 @@ void multigrid_pcg_3d(REAL *u,
     }    
 }
 
+/**
+ * @brief PCG for 2D poisson problem
+ *
+ * @param u solution vector
+ * @param b right hand vector
+ * @param level position of first element in each level
+ * @param maxlevel number of maximum level
+ * @param nx number of grids in x direction
+ * @param ny number of grids in y direction
+ */
 void multigrid_pcg_2d(REAL *u,
                       REAL *b,
                       INT *level,
@@ -313,6 +384,16 @@ void multigrid_pcg_2d(REAL *u,
     }    
 }
 
+/**
+ * @brief FULL MG for 2D poisson problem
+ *
+ * @param u solution vector
+ * @param b right hand vector
+ * @param level position of first element in each level
+ * @param maxlevel number of maximum level
+ * @param nx number of grids in x direction
+ * @param ny number of grids in y direction
+ */
 void multigrid_full_2d(REAL *u,
                        REAL *b,
                        INT *level,
@@ -356,6 +437,15 @@ void multigrid_full_2d(REAL *u,
     }
 }
 
+/**
+ * @brief Full MG for 1D poisson problem
+ *
+ * @param u solution vector
+ * @param b right hand vector
+ * @param level position of first element in each level
+ * @param maxlevel number of maximum level
+ * @param nx number of grids in x direction
+ */
 void multigrid_full_1d(REAL *u,
                        REAL *b,
                        INT *level,
