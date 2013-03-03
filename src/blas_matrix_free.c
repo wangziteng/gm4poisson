@@ -1,3 +1,10 @@
+/**
+ * @file blas_matrix_free.c
+ * @brief BLAS lib
+ * @author Ziteng Wang
+ * @version 1.0
+ * @date 2013-03-03
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
@@ -5,6 +12,16 @@
 
 #include "multigrid_functs.h"
 
+
+/**
+ * @brief Compute Residue Vector 1D
+ *
+ * @param b right hand
+ * @param u solution
+ * @param r residue vector
+ * @param k current level of grids
+ * @param level indicator of each level
+ */
 void compute_r_1d(REAL *b,
                   REAL *u,
                   REAL *r,
@@ -22,6 +39,17 @@ void compute_r_1d(REAL *b,
     r[level[k]+n-1] = b[level[k]+n-1]-2*u[level[k]+n-1]+u[level[k]+n-2];
 }
 
+/**
+ * @brief Compute Residue Vector 2D
+ *
+ * @param u right hand
+ * @param b solution
+ * @param r residue vector
+ * @param k current level of grids
+ * @param level indicator of each level
+ * @param nxk number of cells in x direction in level k
+ * @param nyk number of cells in y direction in level k
+ */
 void compute_r_2d(REAL *u,
                   REAL *b,
                   REAL *r,
@@ -62,6 +90,18 @@ void compute_r_2d(REAL *u,
 }    
             
 
+/**
+ * @brief Compute Residue Vector 3D
+ *
+ * @param u right hand vector
+ * @param b solution
+ * @param r residue vector
+ * @param k current level of the multigrids
+ * @param level indicator of each level k
+ * @param nxk number of cells in x direction in level k
+ * @param nyk number of cells in y direction in level k
+ * @param nzk number of cells in z direction in level k
+ */
 void compute_r_3d(REAL *u,
                   REAL *b,
                   REAL *r,
@@ -240,6 +280,16 @@ void compute_r_3d(REAL *u,
     //                                     u[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]-1];
 }    
 
+
+/**
+ * @brief Compute L2 Norm
+ *
+ * @param r residue vector
+ * @param level indicator of each level k
+ * @param k current level of the multigrid
+ *
+ * @return L2 Norm
+ */
 REAL computenorm(REAL *r,
                  INT *level,
                  INT k)
@@ -257,6 +307,14 @@ REAL computenorm(REAL *r,
     return squarnorm;
 } 
 
+/**
+ * @brief x = y
+ *
+ * @param x vector x
+ * @param y vector y
+ * @param level indicator of each level of multigrids
+ * @param k current level of multigrids
+ */
 void xequaly(REAL *x,
              REAL *y,
              INT *level,
@@ -271,6 +329,16 @@ void xequaly(REAL *x,
     }
 }
 
+/**
+ * @brief x = y + c*z
+ *
+ * @param x vector x
+ * @param y vector y
+ * @param c coefficient c
+ * @param z vector z
+ * @param level indicator of each level of multigrids
+ * @param k current level of multigrids
+ */
 void xequalypcz(REAL *x,
                 REAL *y,
                 REAL c,
@@ -287,6 +355,16 @@ void xequalypcz(REAL *x,
     }
 }
 
+/**
+ * @brief Compute quadratic form of A 1D
+ *
+ * @param u vector u
+ * @param level indicator of each level k of multigrids
+ * @param k current level of multigrids
+ * @param nxk number of cells in x direction
+ *
+ * @return quadratic form of A 
+ */
 REAL compute_quad_norm_1d(REAL *u,
                           INT *level, 
                           INT k,
@@ -307,6 +385,17 @@ REAL compute_quad_norm_1d(REAL *u,
     return norm;
 }
 
+/**
+ * @brief Compute Quadratic form of A 2D
+ *
+ * @param u vector u
+ * @param level indicator of each level of multigrids
+ * @param k current level of multigrids
+ * @param nxk number of cells in x direction in level k
+ * @param nyk number of cells in y direction in level k
+ *
+ * @return norm
+ */
 REAL compute_quad_norm_2d(REAL *u,
                           INT *level,
                           INT k,
@@ -360,6 +449,18 @@ REAL compute_quad_norm_2d(REAL *u,
     return norm;
 }
 
+/**
+ * @brief Compute Quadratic form of A 3D
+ *
+ * @param u vector u
+ * @param level indicator of each level of multigrids
+ * @param k current level of multigrids
+ * @param nxk number of cells in x direction in level k
+ * @param nyk number of cells in y direction in level k
+ * @param nzk number of cells in z direction in level k
+ *
+ * @return norm
+ */
 REAL compute_quad_norm_3d(REAL *u,
                           INT *level,
                           INT k,
@@ -559,6 +660,14 @@ REAL compute_quad_norm_3d(REAL *u,
     return norm;
 }
 
+/**
+ * @brief x = Ay
+ *
+ * @param x vector x
+ * @param y vector y
+ * @param level  indicator of each level of multigrids
+ * @param k current level of multigrids
+ */
 void xequalay_1d(REAL *x,
                  REAL *y,
                  INT *level,
@@ -580,6 +689,16 @@ void xequalay_1d(REAL *x,
 }
 
 
+/**
+ * @brief x = Ay 2D
+ *
+ * @param x vector x
+ * @param y vector y
+ * @param level  indicator of each level of multigrids
+ * @param k current level of multigrid
+ * @param nxk number of cells in x direction in level k
+ * @param nyk number of cells in y direction in level k
+ */
 void xequalay_2d(REAL *x,
                  REAL *y,
                  INT *level,
@@ -602,6 +721,17 @@ void xequalay_2d(REAL *x,
     free(btemp);
 }
 
+/**
+ * @brief x = Ay 3D
+ *
+ * @param x vector x
+ * @param y vector y
+ * @param level indicator of each level of multigrids
+ * @param k current level of multigrids
+ * @param nxk number of cells in x direction in level k
+ * @param nyk number of cells in y direction in level k
+ * @param nzk number of cells in z direction in level k
+ */
 void xequalay_3d(REAL *x,
                  REAL *y,
                  INT *level,
@@ -625,6 +755,17 @@ void xequalay_3d(REAL *x,
     //free(btemp);
 }
 
+
+/**
+ * @brief <x,y>
+ *
+ * @param x vector x
+ * @param y vector y
+ * @param level indicator of each level of multigrids
+ * @param k current level of multigrids
+ *
+ * @return 
+ */
 REAL innerproductxy(REAL *x, 
 					REAL *y, 
 					INT *level, 
@@ -644,6 +785,13 @@ REAL innerproductxy(REAL *x,
 }
 
 
+/**
+ * @brief set initial F
+ *
+ * @param x number x
+ *
+ * @return F
+ */
 REAL F(REAL x)
 {
   REAL r = exp(x) * (3.0 + x) * x; 
