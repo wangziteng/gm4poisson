@@ -1,3 +1,10 @@
+/**
+ * @file multigrid_matrixfree.c
+ * @brief All the algorithm of v-cycle, pcg and full multigrid
+ * @author Ziteng Wang
+ * @version 1.0
+ * @date 2013-04-02
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include "malloc.h"
@@ -6,6 +13,14 @@
 
 #include "multigrid_functs.h"
 
+/**
+ * @brief a v-cycle process of multigrid for 1d poisson problem
+ *
+ * @param u solution vector
+ * @param b right hand vector
+ * @param level a vector containing information of all grids. For exmaple, level[0] is the first position of level 0.
+ * @param maxlevel number of levels
+ */
 void multigriditeration1d(REAL *u,
                           REAL *b,
                           INT *level,
@@ -91,6 +106,16 @@ void multigriditeration1d(REAL *u,
     free(r);
 }
 
+/**
+ * @brief a v-cycle process of multigrid for 1d poisson problem
+ *
+ * @param u solution vector
+ * @param b right hand vector
+ * @param level a vector containing information of all grids. For exmaple, level[0] is the first position of level 0.
+ * @param maxlevel number of all levels
+ * @param nx number of cells on x direction
+ * @param ny number of cells on y direction
+ */
 void multigriditeration2d(REAL *u,
                           REAL *b,
                           INT *level,
@@ -134,7 +159,7 @@ void multigriditeration2d(REAL *u,
         // restriction on coarser grids
         coarsergrid7pointrestriction2d(b, r, level, k, nxk, nyk);
 	}
-	
+
     // coarsest grid
     if(k==maxlevel-1){
         u[level[k]+4] = b[level[k]+4]/4;
@@ -158,6 +183,17 @@ void multigriditeration2d(REAL *u,
     free(r);
 }
 
+/**
+ * @brief a v-cycle process of multigrid for 1d poisson problem
+ *
+ * @param u solution vector
+ * @param b right hand vector
+ * @param level a vector containing information of all grids. For exmaple, level[0] is the first position of level 0.
+ * @param maxlevel number of levels
+ * @param nx number of cells on x direction
+ * @param ny number of cells on y direction
+ * @param nz number of cells on z direction
+ */
 void multigriditeration3d(REAL *u,
 						  REAL *b,
                           INT *level,
@@ -239,6 +275,16 @@ void multigriditeration3d(REAL *u,
 	free(nzk);
 }
 
+/**
+ * @brief Full multigrid for 1d poisson equation
+ *
+ * @param u solution vector
+ * @param b right hand vector
+ * @param level a vector containing information of all grids. For exmaple, level[0] is the first position of level 0
+ * @param maxlevel number of all levels
+ * @param nx number of cells in x direction
+ * @param rtol relative tolerance
+ */
 void fullmultigrid_1d(REAL *u,
                       REAL *b,
                       INT *level,
@@ -333,16 +379,16 @@ void fullmultigrid_1d(REAL *u,
 }
 
 
-void vcycle_at_levelk_1d(REAL *u, 
-					     REAL *b, 
-						 REAL *r, 
-						 INT *level, 
-						 INT k,
-						 INT maxlevel)
+static vcycle_at_levelk_1d(REAL *u, 
+	 				       REAL *b, 
+						   REAL *r, 
+						   INT *level, 
+						   INT k,
+						   INT maxlevel)
 {
 	INT i,j,h,i1,n;
 	REAL res,norm_r0,norm_r;
-	
+
 	// forward sweep
     for (h = k; h < maxlevel-1; h++) {
         
@@ -377,7 +423,7 @@ void vcycle_at_levelk_1d(REAL *u,
 		    }
         }   
 	}
-	
+
     // coarsest grid
     if(h==maxlevel-1){
         i = level[maxlevel-1];
@@ -417,6 +463,17 @@ void vcycle_at_levelk_1d(REAL *u,
     }
 }
 
+/**
+ * @brief Full multigrid for 2d poisson problem
+ *
+ * @param u solution vector
+ * @param b right hand vector
+ * @param level a vector containing information of all grids. For exmaple, level[0] is the first position of level 0
+ * @param maxlevel number of total levels
+ * @param nx number of cells in x direction
+ * @param ny number of cells in y direction
+ * @param rtol relative tolerance
+ */
 void fullmultigrid_2d(REAL *u,
                       REAL *b,
                       INT *level,
@@ -496,18 +553,18 @@ void fullmultigrid_2d(REAL *u,
 }
 
 
-void vcycle_at_levelk_2d(REAL *u, 
-					     REAL *b, 
-						 REAL *r, 
-						 INT *level, 
-						 INT k, 
-						 INT maxlevel, 
-						 INT *nxk, 
-						 INT *nyk)
+static vcycle_at_levelk_2d(REAL *u, 
+		  			       REAL *b, 
+						   REAL *r, 
+						   INT *level, 
+						   INT k, 
+						   INT maxlevel, 
+						   INT *nxk, 
+						   INT *nyk)
 {
 	INT i,j,h,i1;
 	REAL res,norm_r0;
-	
+
 	// forward sweep
     for (h = k; h < maxlevel-1; h++) {
         
@@ -532,7 +589,7 @@ void vcycle_at_levelk_2d(REAL *u,
         // restriction on coarser grids
         coarsergrid7pointrestriction2d(b, r, level, h, nxk, nyk);
 	}
-	
+
     // coarsest grid
     if(h==maxlevel-1){
         u[level[h]+4] = b[level[h]+4]/4;
@@ -556,6 +613,18 @@ void vcycle_at_levelk_2d(REAL *u,
     }
 }
 
+/**
+ * @brief Full multigrid for 3d poisson problem
+ *
+ * @param u solution vector
+ * @param b right hand vector
+ * @param level a vector containing information of all grids. For exmaple, level[0] is the first position of level 0 
+ * @param maxlevel number of total levels
+ * @param nx number of cells in x direction
+ * @param ny number of cells in y direction
+ * @param nz number of cells in z direction
+ * @param rtol relative tolerance
+ */
 void fullmultigrid_3d(REAL *u,
                       REAL *b,
                       INT *level,
@@ -611,7 +680,7 @@ void fullmultigrid_3d(REAL *u,
         norm_r = computenorm(r, level, k);
 		printf("residue of level[%d] = %f\n",k,norm_r);
         while (norm_r>rtol) {
-            vcycle_at_levelk(u, b, r, level, k, maxlevel, nxk, nyk, nzk);
+            vcycle_at_levelk3d(u, b, r, level, k, maxlevel, nxk, nyk, nzk);
             compute_r_3d(u, b, r, k, level, nxk, nyk, nzk);
             norm_r = computenorm(r, level, k);
         }
@@ -620,15 +689,15 @@ void fullmultigrid_3d(REAL *u,
 }
 
 
-void vcycle_at_levelk(REAL *u, 
-					  REAL *b, 
-					  REAL *r, 
-					  INT *level, 
-					  INT k, 
-					  INT maxlevel, 
-					  INT *nxk, 
-					  INT *nyk, 
-					  INT *nzk)
+static vcycle_at_levelk3d(REAL *u, 
+					      REAL *b, 
+					      REAL *r, 
+					      INT *level, 
+					      INT k, 
+					      INT maxlevel, 
+					      INT *nxk, 
+					      INT *nyk, 
+					      INT *nzk)
 {
 	INT i,j,h;
 	REAL res;
@@ -711,40 +780,60 @@ void pcg_2d(REAL *u,
 		return;
 	}
 
-    while (!done && k < maxiteration) {
-		// precondition the residue
-		multigriditeration2d(z, r, level, maxlevel, nx, ny);
-//		xequaly(z, r, level, 0);
-		rh0 = innerproductxy(r, z, level, 0);
-		if (k==0) {
-			xequaly(p, z, level, 0);
-		}
-		else {
-			beta = rh0/rh1;
-			xequalypcz(p, z, beta, p, level, 0);
-		}
+    multigriditeration2d(z, r, level, maxlevel, nx, ny);
+	//xequaly(z, r, level, 0);	
+    rh0 = innerproductxy(r, z, level, 0);
+    xequaly(p, z, level, 0);
 
-		xequalay_2d(q, p, level, 0, nxk, nyk);
+    while (!done && k < maxiteration) {
+		// init z
+        for (i = 0; i < level[1]; i++) z[i] = 0;
+
+        // calculating alpha
+        xequalay_2d(q, p, level, 0, nxk, nyk);
 		rh2 = innerproductxy(q, p, level, 0);
 		alfa = rh0/rh2;
 
+        // update vector u, r
 		xequalypcz(u, u, alfa, p, level, 0);
 		xequalypcz(r, r, (-alfa), q, level, 0);
-
 		normr = computenorm(r, level, 0);
 		if ((resid = normr / normb) <= rtol) {
 			done = 1;     
 		}
-		rh1 = rh0;
 
+        // update z and beta
+        multigriditeration2d(z, r, level, maxlevel, nx, ny);
+		//xequaly(z, r, level, 0);	
+        rh1 = innerproductxy(r, z, level, 0);
+        beta = rh1 / rh0;
+
+        // update p
+        xequalypcz(p, z, beta, p, level, 0);
+
+		rh0 = rh1;
 		k++;
 	}
+	printf("iteration number = %d\n",k);
     free(r);
     free(q);
     free(p);
 	free(z);
 }
 
+/**
+ * @brief A multigrid-preconditioned CG process for 3d Poisson problem
+ *
+ * @param u solution vector
+ * @param b right hand vector
+ * @param level a vector containing information of all grids. For exmaple, level[0] is the first position of level 0
+ * @param maxlevel number of total levels 
+ * @param nx number of cells in x direction
+ * @param ny number of cells in y direction
+ * @param nz number of cells in z direction
+ * @param rtol relative tolerance
+ * @param maxiteration maximum CG iteration number
+ */
 void pcg_3d(REAL *u,
             REAL *b,
             INT *level,
@@ -757,19 +846,26 @@ void pcg_3d(REAL *u,
 {
     INT i,j,k,done;
 	INT nxk[1], nyk[1], nzk[1];
-    REAL *p, *r, *z, *q, *rconv;
+    REAL *p, *r, *z, *q;
     REAL rh0, rh1, rh2, alfa, beta, resnorm, normb, normr, resid;
 
     p = (REAL *)malloc(level[1]*sizeof(REAL));
     r = (REAL *)malloc(level[maxlevel]*sizeof(REAL));
-	rconv = (REAL *)malloc(level[maxlevel]*sizeof(REAL));
 	z = (REAL *)malloc(level[maxlevel]*sizeof(REAL));
 	q = (REAL *)malloc(level[1]*sizeof(REAL));
 	done = 0;
     k = 0;
-	nxk[0] = nx; nyk[0] = ny; nzk[0] = nz;
+	nxk[0] = nx+1; nyk[0] = ny+1; nzk[0] = nz+1;
 
     // initial residue and other vector
+	for (i = 0; i < level[1]; i++){
+		z[i] = 0.0;
+		r[i] = 0.0;
+	}
+	for (i = 0; i < level[1]; i++){
+		p[i] = 0.0;
+		q[i] = 0.0;
+	}
 	compute_r_3d(u, b, r, 0, level, nxk, nyk, nzk);
 	normr = computenorm(r, level, 0);
 	normb = computenorm(b, level, 0);
@@ -779,45 +875,59 @@ void pcg_3d(REAL *u,
 	if ((resid = normr / normb) <= rtol) {
 		return;
 	}
-	// z vector
-	for (i = 0; i < level[maxlevel]; i++){
-		z[i] = 0.0;
-	}
+
+	multigriditeration3d(z, r, level, maxlevel, nx, ny, nz);
+	//xequaly(z, r, level, 0);	
+    rh0 = innerproductxy(r, z, level, 0);
+    xequaly(p, z, level, 0);
 
     while (!done && k < maxiteration) {
-		// precondition the residue
-		multigriditeration3d(z, r, level, maxlevel, nx, ny, nz);
-//		xequaly(z, r, level, 0);
-		rh0 = innerproductxy(r, z, level, 0);
-		if (k==0) {
-			xequaly(p, z, level, 0);
-		}
-		else {
-			beta = rh0/rh1;
-			xequalypcz(p, z, beta, p, level, 0);
-		}
+		// init z
+        for (i = 0; i < level[1]; i++) z[i] = 0;
 
-		xequalay_3d(q, p, level, 0, nxk, nyk, nzk);
+        // calculating alpha
+        xequalay_3d(q, p, level, 0, nxk, nyk, nzk);
 		rh2 = innerproductxy(q, p, level, 0);
 		alfa = rh0/rh2;
 
+        // update vector u, r
 		xequalypcz(u, u, alfa, p, level, 0);
 		xequalypcz(r, r, (-alfa), q, level, 0);
-
 		normr = computenorm(r, level, 0);
 		if ((resid = normr / normb) <= rtol) {
 			done = 1;     
 		}
-		rh1 = rh0;
 
+        // update z and beta
+        multigriditeration3d(z, r, level, maxlevel, nx, ny, nz);
+		//xequaly(z, r, level, 0);	
+        rh1 = innerproductxy(r, z, level, 0);
+        beta = rh1 / rh0;
+
+        // update p
+        xequalypcz(p, z, beta, p, level, 0);
+
+		rh0 = rh1;
 		k++;
 	}
+	printf("iteration number = %d\n",k);
     free(r);
     free(q);
     free(p);
 	free(z);
 }
 
+/**
+ * @brief 2 Color G-S iteration for 2d poisson problem
+ *
+ * @param u solution vector
+ * @param b right hand vector
+ * @param level a vector containing information of all grids. For exmaple, level[0] is the first position of level 0
+ * @param k current level
+ * @param maxlevel number of total levels
+ * @param nxk number of cells in x direction of level k
+ * @param nyk number of cells in y direction of level k
+ */
 void gsiteration_2color_2d(REAL *u,
 						   REAL *b,
 						   INT *level,
@@ -859,6 +969,20 @@ void gsiteration_2color_2d(REAL *u,
         }
 	}
 }
+
+
+/**
+ * @brief 2 Color G-S iteration for 2d poisson problem
+ *
+ * @param u solution vector
+ * @param b right hand vector
+ * @param level a vector containing information of all grids. For exmaple, level[0] is the first position of level 0
+ * @param k current level
+ * @param maxlevel number of total levels
+ * @param nxk number of cells in x direction of level k
+ * @param nyk number of cells in y direction of level k
+ * @param nzk number of cells in z direction of level k
+ */
 void gsiteration_2color_3d(REAL *u,
                            REAL *b,
                            INT *level,
@@ -1006,7 +1130,7 @@ void gsiteration_2color_3d(REAL *u,
     }
 }
 
-void coarsergrid7pointrestriction2d(REAL *b, 
+static coarsergrid7pointrestriction2d(REAL *b, 
 									REAL *r, 
 									INT *level, 
 									INT k, 
@@ -1038,7 +1162,7 @@ void coarsergrid7pointrestriction2d(REAL *b,
 	b[level[k+1]+nxk[k+1]*nyk[k+1]-1] = r[level[k]+(nyk[k]-1)*nxk[k]-2]/2;
 }
 
-void coarsergrid7pointrestriction3d(REAL *b, 
+static coarsergrid7pointrestriction3d(REAL *b, 
 									REAL *r, 
 									INT *level, 
 									INT k, 
@@ -1076,7 +1200,7 @@ void coarsergrid7pointrestriction3d(REAL *b,
 	}
 }
 
-void finergridinterpolation2d(REAL *u,
+static finergridinterpolation2d(REAL *u,
 							  INT *level, 
 							  INT k, 
 							  INT *nxk, 
@@ -1097,7 +1221,7 @@ void finergridinterpolation2d(REAL *u,
 	}
 }
 
-void finergridinterpolation3d(REAL *u, 
+static finergridinterpolation3d(REAL *u, 
 							  INT *level, 
 							  INT k, 
 							  INT *nxk, 
