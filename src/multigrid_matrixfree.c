@@ -737,6 +737,87 @@ static vcycle_at_levelk3d(REAL *u,
 		h = h+1;
 	}
 }
+void pcg_1d(REAL *u,
+            REAL *b,
+            INT *level,
+			INT maxlevel,
+            INT nx,
+            REAL rtol,
+			INT maxiteration)
+{
+    INT i,j,k,done;
+	INT nxk[1];
+    REAL *p, *r, *z, *q;
+    REAL rh0, rh1, rh2, alfa, beta, resnorm, normb, normr, resid;
+
+    p = (REAL *)malloc(level[1]*sizeof(REAL));
+    r = (REAL *)malloc(3*nx*sizeof(REAL));
+	z = (REAL *)malloc(3*nx*sizeof(REAL));
+	q = (REAL *)malloc(level[1]*sizeof(REAL));
+	done = 0;
+    k = 0;
+	nxk[0] = nx+1; 
+
+    // initial residue and other vector
+	for (i = 0; i < 3*nx; i++){
+		z[i] = 0.0;
+		r[i] = 0.0;
+	}
+	for (i = 0; i < level[1]; i++){
+		p[i] = 0.0;
+		q[i] = 0.0;
+	}
+
+	compute_r_1d(u, b, r, 0, level, nxk, nyk);
+	normr = computenorm(r, level, 0);
+	normb = computenorm(b, level, 0);
+	if (normb==0.0) {
+		normb==1.0;
+	}
+	if ((resid = normr / normb) <= rtol) {
+		return;
+	}
+
+    multigriditeration1d(z, r, level, maxlevel);
+	//xequaly(z, r, level, 0);	
+    rh0 = innerproductxy(r, z, level, 0);
+    xequaly(p, z, level, 0);
+
+    while (!done && k < maxiteration) {
+		// init z
+        for (i = 0; i < level[1]; i++) z[i] = 0;
+
+        // calculating alpha
+        xequalay_1d(q, p, level, 0, nxk);
+		rh2 = innerproductxy(q, p, level, 0);
+		alfa = rh0/rh2;
+
+        // update vector u, r
+		xequalypcz(u, u, alfa, p, level, 0);
+		xequalypcz(r, r, (-alfa), q, level, 0);
+		normr = computenorm(r, level, 0);
+		if ((resid = normr / normb) <= rtol) {
+			done = 1;     
+		}
+
+        // update z and beta
+        multigriditeration1d(z, r, level, maxlevel, nx);
+		//xequaly(z, r, level, 0);	
+        rh1 = innerproductxy(r, z, level, 0);
+        beta = rh1 / rh0;
+
+        // update p
+        xequalypcz(p, z, beta, p, level, 0);
+
+		rh0 = rh1;
+		k++;
+	}
+	printf("iteration number = %d\n",k);
+    free(r);
+    free(q);
+    free(p);
+	free(z);
+}
 
 void pcg_2d(REAL *u,
             REAL *b,
