@@ -48,7 +48,7 @@ void multigrid_vcycle_1d(REAL *u,
 //        return 0;
     }
 
-	done = 0; max_itr_num = 15;count=0;
+	done = 0; max_itr_num = 50;count=0;
 
     while ((!done) && (count < max_itr_num)) {
         count++;
@@ -159,31 +159,32 @@ void multigrid_vcycle_3d(REAL *u,
 						 INT nz)
 {
     REAL atol = 1.0E-15;   
-	REAL rtol = 1.0E-8;
+	REAL rtol = 1.0E-6;
 	REAL error;
     REAL *r0;
     REAL norm_r0, norm_r, time0;
     INT done, max_itr_num,count,i,nxk0[1], nyk0[1], nzk0[1];
 	clock_t t1,t2;
 
-	t1 = clock();
-
     r0 = (REAL *)malloc(level[maxlevel]*sizeof(REAL));
-	for(i=0;i<level[maxlevel];i++){
-		r0[i] = 0;
-	}
+	//for(i=0;i<level[maxlevel];i++){
+	//	r0[i] = 0;
+	//}
 	nxk0[0] = nx+1;
 	nyk0[0] = ny+1;
 	nzk0[0] = nz+1;
 
 	compute_r_3d(u, b, r0, 0, level, nxk0, nyk0, nzk0);
     norm_r0 = computenorm(r0, level, 0);
+	printf("norm_r0=%12.15lf\n",norm_r0);
     if (norm_r0 < atol) {
         free(r0);
         return;
     }
 
-	done = 0; max_itr_num = 50;count=0;
+	t1 = clock();
+
+	done = 0; max_itr_num = 20;count=0;
 
     while ((!done) && (count < max_itr_num)) {
         count++;
@@ -191,8 +192,9 @@ void multigrid_vcycle_3d(REAL *u,
         compute_r_3d(u, b, r0, 0, level, nxk0, nyk0, nzk0);
         norm_r = computenorm(r0, level, 0);
         error = norm_r / norm_r0;
-		printf("%f,%d\n",error,count);
+		printf("%12.15lf,%d\n",error,count);
         if (error < rtol) {
+			printf("rel.error=%12.15lf,iteration number=%d\n",error,count);
             done = 1;                
         }
     }    
@@ -294,10 +296,12 @@ void multigrid_pcg_3d(REAL *u,
 {    
 	REAL atol = 1.0E-15;   
 	REAL rtol = 1.0E-8;
-	REAL error;
     REAL *r0;
-    REAL norm_r0, norm_r;
-    INT done, max_itr_num,count,i,nxk0[1], nyk0[1], nzk0[1];
+    REAL norm_r0, time0;
+    INT max_itr_num,i,nxk0[1], nyk0[1], nzk0[1];
+	clock_t t1,t2;
+
+	t1 = clock();
 
     r0 = (REAL *)malloc(level[maxlevel]*sizeof(REAL));
 	for(i=0;i<level[maxlevel];i++){
@@ -315,19 +319,13 @@ void multigrid_pcg_3d(REAL *u,
 //        return 0;
     }
 
-	done = 0; max_itr_num = 50;count=0;
+	max_itr_num = 50;
+    pcg_3d(u, b, level, maxlevel, nx, ny, nz, rtol, max_itr_num);
 
-    while ((!done) && (count < max_itr_num)) {
-        count++;
-        pcg_3d(u, b, level, maxlevel, nx, ny, nz, rtol, max_itr_num);
-        compute_r_3d(u, b, r0, 0, level, nxk0, nyk0, nzk0);
-        norm_r = computenorm(r0, level, 0);
-        error = norm_r / norm_r0;
-		printf("%f,%d\n",error,count);
-        if (error < rtol) {
-            done = 1;                
-        }
-    }    
+	t2 = clock();
+	time0 = (double)(t2 - t1) / CLOCKS_PER_SEC;
+    printf("%lf seconds\n", time0);
+	free(r0);
 }
 
 /**
@@ -349,10 +347,9 @@ void multigrid_pcg_2d(REAL *u,
 {    
 	REAL atol = 1.0E-15;   
 	REAL rtol = 1.0E-8;
-	REAL error;
     REAL *r0;
-    REAL norm_r0, norm_r;
-    INT done, max_itr_num,count,i,nxk0[1], nyk0[1], nzk0[1];
+    REAL norm_r0;
+    INT max_itr_num,i,nxk0[1], nyk0[1];
 
     r0 = (REAL *)malloc(3*nx*ny*sizeof(REAL));
 	for(i=0;i<3*nx*ny;i++){
@@ -369,19 +366,8 @@ void multigrid_pcg_2d(REAL *u,
 		return;
     }
 
-	done = 0; max_itr_num = 50;count=0;
-
-    while ((!done) && (count < max_itr_num)) {
-        count++;
-        pcg_2d(u, b, level, maxlevel, nx, ny, rtol, max_itr_num);
-        compute_r_2d(u, b, r0, 0, level, nxk0, nyk0);
-        norm_r = computenorm(r0, level, 0);
-        error = norm_r / norm_r0;
-		printf("%f,%d\n",error,count);
-        if (error < rtol) {
-            done = 1;                
-        }
-    }    
+	max_itr_num = 500;
+    pcg_2d(u, b, level, maxlevel, nx, ny, rtol, max_itr_num);    
 }
 
 /**
@@ -403,10 +389,9 @@ void multigrid_full_2d(REAL *u,
 {
     REAL atol = 1.0E-15;   
 	REAL rtol = 1.0E-8;
-	REAL error;
     REAL *r0;
-    REAL norm_r0, norm_r;
-    INT done, max_itr_num,count,i,nxk0[1], nyk0[1], nzk0[1];
+    REAL norm_r0;
+    INT i,nxk0[1], nyk0[1];
 
     r0 = (REAL *)malloc(3*nx*ny*sizeof(REAL));
 	for(i=0;i<3*nx*ny;i++){
@@ -422,19 +407,7 @@ void multigrid_full_2d(REAL *u,
         return;
     }
 
-	done = 0; max_itr_num = 50;count=0;
-
-    while ((!done) && (count < max_itr_num)) {
-        count++;
-        fullmultigrid_2d(u, b, level, maxlevel, nx, ny, rtol);
-        compute_r_2d(u, b, r0, 0, level, nxk0, nyk0);
-        norm_r = computenorm(r0, level, 0);
-        error = norm_r / norm_r0;
-		printf("%f,%d\n",error,count);
-        if (error < rtol) {
-            done = 1;                
-        }
-    }
+    fullmultigrid_2d(u, b, level, maxlevel, nx, ny, rtol);
 }
 
 /**
@@ -454,10 +427,9 @@ void multigrid_full_1d(REAL *u,
 {
     REAL atol = 1.0E-15;   
 	REAL rtol = 1.0E-8;
-	REAL error;
     REAL *r0;
-    REAL norm_r0, norm_r;
-    INT done, max_itr_num,count,i,nxk0[1] ;
+    REAL norm_r0;
+    INT i,nxk0[1] ;
 
     r0 = (REAL *)malloc(level[maxlevel]*sizeof(REAL));
 	for(i=0;i<level[maxlevel];i++){
@@ -472,17 +444,45 @@ void multigrid_full_1d(REAL *u,
         return;
     }
 
-	done = 0; max_itr_num = 50;count=0;
-
-    while ((!done) && (count < max_itr_num)) {
-        count++;
-        fullmultigrid_1d(u, b, level, maxlevel, nx, rtol);
-        compute_r_1d(u, b, r0, 0, level);
-        norm_r = computenorm(r0, level, 0);
-        error = norm_r / norm_r0;
-		printf("%f,%d\n",error,count);
-        if (error < rtol) {
-            done = 1;                
-        }
-    }
+    fullmultigrid_1d(u, b, level, maxlevel, nx, rtol);
 }
+
+/**
+ * @brief PCG for 2D poisson problem
+ *
+ * @param u solution vector
+ * @param b right hand vector
+ * @param level position of first element in each level
+ * @param maxlevel number of maximum level
+ * @param nx number of grids in x direction
+ * @param ny number of grids in y direction
+ */
+void multigrid_pcg_1d(REAL *u,
+                      REAL *b,
+                      INT *level,
+                      INT maxlevel,
+					  INT nx)
+{    
+	REAL atol = 1.0E-15;   
+	REAL rtol = 1.0E-8;
+    REAL *r0;
+    REAL norm_r0; 
+    INT max_itr_num,i;
+
+    r0 = (REAL *)malloc(3*nx*sizeof(REAL));
+	for(i=0;i<3*nx;i++){
+		r0[i] = 0;
+	}
+
+    compute_r_1d(u, b, r0, 0, level);
+    norm_r0 = computenorm(r0, level, 0);
+	printf("norm_r0 = %f\n",norm_r0);
+    if (norm_r0 < atol) {
+        free(r0);
+		return;
+    }
+
+	max_itr_num = 500;
+    pcg_1d(u, b, level, maxlevel, nx, rtol, max_itr_num);    
+}
+

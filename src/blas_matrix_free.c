@@ -112,73 +112,21 @@ void compute_r_3d(REAL *u,
                   INT *nzk)
 {
     int i,j,h;       
+	int i0,j0,j1,j2,k0,k1,k2,k3,k4,k5,k6;
+    const int levelk = level[k];
+	const int nxkk = nxk[k];
+	const int nykk = nyk[k];
+	const int nzkk = nzk[k];
 
-    //// bottom plane
-    //r[level[k]] = b[level[k]] - 6*u[level[k]] + u[level[k]+1] + u[level[k]+nxk[k]] + u[level[k]+nxk[k]*nyk[k]];
-    //for (h = 1; h < nxk[k]-1; h++) {
-    //    r[level[k]+h] = b[level[k]+h]-6*u[level[k]+h]+u[level[k]+h+1]+u[level[k]+h-1]+
-    //                    u[level[k]+h+nxk[k]]+u[level[k]+h+nxk[k]*nyk[k]];
-    //}
-    //r[level[k]+nxk[k]-1] = b[level[k]+nxk[k]-1]-6*u[level[k]+nxk[k]-1]+u[level[k]+nxk[k]-2]+
-    //                       u[level[k]+2*nxk[k]-1]+u[level[k]+nxk[k]-1+nxk[k]*nyk[k]];
-    //for (h = 1; h < nyk[k]-1; h++) {
-    //    r[level[k]+h*nxk[k]] = b[level[k]+h*nxk[k]]-6*u[level[k]+h*nxk[k]]+u[level[k]+h*nxk[k]+1]+
-    //                           u[level[k]+(h-1)*nxk[k]]+u[level[k]+(h+1)*nxk[k]]+
-    //                           u[level[k]+h*nxk[k]+nxk[k]*nyk[k]];
-    //    for (i = 1; i < nxk[k]-1; i++) {
-    //        r[level[k]+h*nxk[k]+i] = b[level[k]+h*nxk[k]+i]-6*u[level[k]+h*nxk[k]+i]+
-    //                                 u[level[k]+h*nxk[k]+i+1]+u[level[k]+h*nxk[k]+i-1]+
-    //                                 u[level[k]+h*nxk[k]+i+nxk[k]*nyk[k]]+
-    //                                 u[level[k]+(h+1)*nxk[k]+i]+u[level[k]+(h-1)*nxk[k]+i];
-    //    }
-    //    r[level[k]+(h+1)*nxk[k]-1] = b[level[k]+(h+1)*nxk[k]-1]-6*u[level[k]+(h+1)*nxk[k]-1]+
-    //                                 u[level[k]+(h+1)*nxk[k]-2]+u[level[k]+(h+1+nyk[k])*nxk[k]-1]+
-    //                                 u[level[k]+h*nxk[k]-1]+u[level[k]+(h+2)*nxk[k]-1];
-    //}
-    //r[level[k]+(nyk[k]-1)*nxk[k]] = b[level[k]+(nyk[k]-1)*nxk[k]]-6*u[level[k]+(nyk[k]-1)*nxk[k]]+
-    //                                u[level[k]+(nyk[k]-1)*nxk[k]+1]+u[level[k]+(nyk[k]-2)*nxk[k]]+
-    //                                u[level[k]+(nyk[k]-1)*nxk[k]+nxk[k]*nyk[k]];
-    //for (h = 1; h < nxk[k]-1; h++) {
-    //    r[level[k]+(nyk[k]-1)*nxk[k]+h] = b[level[k]+(nxk[k]-1)*nxk[k]+h]-
-    //                                      6*u[level[k]+(nxk[k]-1)*nxk[k]+h]+
-    //                                      u[level[k]+(nxk[k]-1)*nxk[k]+h+1]+
-    //                                      u[level[k]+(nxk[k]-1)*nxk[k]+h-1]+
-    //                                      u[level[k]+(nxk[k]-2)*nxk[k]+h]+
-    //                                      u[level[k]+(nxk[k]-1)*nxk[k]+h+nxk[k]*nyk[k]];
-    //}
-    //r[level[k]+nxk[k]*nyk[k]-1] = b[level[k]+nxk[k]*nyk[k]-1]-6*u[level[k]+nxk[k]*nyk[k]-1]+
-    //                              u[level[k]+nxk[k]*nyk[k]-2]+u[level[k]+(nyk[k]-1)*nxk[k]-1]+
-    //                              u[level[k]+2*nxk[k]*nyk[k]-1];
-    
     // middle part of the cubic
-    for (i = 1; i < nzk[k]-1; i++) {
-        //// first line
-        //r[level[k]+i*nxk[k]*nyk[k]] = b[level[k]+i*nxk[k]*nyk[k]]-6*u[level[k]+i*nxk[k]*nyk[k]]+
-        //                              u[level[k]+(i-1)*nxk[k]*nyk[k]]+u[level[k]+i*nxk[k]*nyk[k]+1]+
-        //                              u[level[k]+i*nxk[k]*nyk[k]+nxk[k]]+u[level[k]+(i+1)*nxk[k]*nyk[k]];
-        //for (h = 1; h < nxk[k]-1; h++) {
-        //    r[level[k]+i*nxk[k]*nyk[k]+h] = b[level[k]+i*nxk[k]*nyk[k]+h]-6*u[level[k]+i*nxk[k]*nyk[k]+h]+
-        //                                    u[level[k]+i*nxk[k]*nyk[k]+h+1]+u[level[k]+i*nxk[k]*nyk[k]+h-1]+
-        //                                    u[level[k]+(i+1)*nxk[k]*nyk[k]+h]+u[level[k]+(i-1)*nxk[k]*nyk[k]+h]+
-        //                                    u[level[k]+i*nxk[k]*nyk[k]+h+nxk[k]];
-        //}
-        //r[level[k]+i*nxk[k]*nyk[k]+nxk[k]-1] = b[level[k]+i*nxk[k]*nyk[k]+nxk[k]-1]-
-        //                                       6*u[level[k]+i*nxk[k]*nyk[k]+nxk[k]-1]+
-        //                                       u[level[k]+i*nxk[k]*nyk[k]+nxk[k]-2]+
-        //                                       u[level[k]+i*nxk[k]*nyk[k]+2*nxk[k]-1]+
-        //                                       u[level[k]+(i+1)*nxk[k]*nyk[k]+nxk[k]-1]+
-        //                                       u[level[k]+(i-1)*nxk[k]*nyk[k]+nxk[k]-1];
-    
-        for (j = 1; j < nyk[k]-1; j++) {
-            //r[level[k]+i*nxk[k]*nyk[k]+j*nxk[k]] = b[level[k]+i*nxk[k]*nyk[k]+j*nxk[k]]-
-            //                                       6*u[level[k]+i*nxk[k]*nyk[k]+j*nxk[k]]+
-            //                                       u[level[k]+i*nxk[k]*nyk[k]+j*nxk[k]+1]+
-            //                                       u[level[k]+i*nxk[k]*nyk[k]+(j+1)*nxk[k]]+
-            //                                       u[level[k]+i*nxk[k]*nyk[k]+(j-1)*nxk[k]]+
-            //                                       u[level[k]+(i+1)*nxk[k]*nyk[k]+j*nxk[k]]+
-            //                                       u[level[k]+(i-1)*nxk[k]*nyk[k]+j*nxk[k]];
-            for (h = 1; h < nxk[k]-1; h++) {
-                r[level[k]+i*nxk[k]*nyk[k]+j*nxk[k]+h] = b[level[k]+i*nxk[k]*nyk[k]+j*nxk[k]+h]-
+    for (i = 1; i < nzkk-1; i++) {
+		i0 = levelk+i*nxkk*nykk;
+        for (j = 1; j < nykk-1; j++) {
+		    j0 = i0+j*nxkk;
+			j1 = i0+(j+1)*nxkk;
+			j2 = i0+(j-1)*nxkk;
+			for (h = 1; h < nxkk-1; h++) {
+/*                r[level[k]+i*nxk[k]*nyk[k]+j*nxk[k]+h] = b[level[k]+i*nxk[k]*nyk[k]+j*nxk[k]+h]-
                                                          6*u[level[k]+i*nxk[k]*nyk[k]+j*nxk[k]+h]+
                                                          u[level[k]+i*nxk[k]*nyk[k]+j*nxk[k]+h+1]+
                                                          u[level[k]+i*nxk[k]*nyk[k]+j*nxk[k]+h-1]+
@@ -186,98 +134,18 @@ void compute_r_3d(REAL *u,
                                                          u[level[k]+i*nxk[k]*nyk[k]+(j-1)*nxk[k]+h]+
                                                          u[level[k]+(i+1)*nxk[k]*nyk[k]+j*nxk[k]+h]+
                                                          u[level[k]+(i-1)*nxk[k]*nyk[k]+j*nxk[k]+h];
-            }
-            //r[level[k]+i*nxk[k]*nyk[k]+(j+1)*nxk[k]-1] = b[level[k]+i*nxk[k]*nyk[k]+(j+1)*nxk[k]-1]-
-            //                                             6*u[level[k]+i*nxk[k]*nyk[k]+(j+1)*nxk[k]-1]+
-            //                                             u[level[k]+i*nxk[k]*nyk[k]+(j+1)*nxk[k]-2]+
-            //                                             u[level[k]+i*nxk[k]*nyk[k]+(j+2)*nxk[k]-1]+
-            //                                             u[level[k]+i*nxk[k]*nyk[k]+j*nxk[k]-1]+
-            //                                             u[level[k]+(i+1)*nxk[k]*nyk[k]+(j+1)*nxk[k]-1]+
-            //                                             u[level[k]+(i-1)*nxk[k]*nyk[k]+(j+1)*nxk[k]-1];
+ */
+				k0 = j0+h;
+				k1 = j0+h-1;
+				k2 = j0+h+1;
+				k3 = j1+h;
+				k4 = j2+h;
+				k5 = k0+nxkk*nykk;
+				k6 = k0-nxkk*nykk;
+				r[k0]=b[k0]-6*u[k0]+u[k1]+u[k2]+u[k3]+u[k4]+u[k5]+u[k6];
+			}
         }
-        //r[level[k]+i*nxk[k]*nyk[k]+(nyk[k]-1)*nxk[k]] = b[level[k]+i*nxk[k]*nyk[k]+(nyk[k]-1)*nxk[k]]-
-        //                                                6*u[level[k]+i*nxk[k]*nyk[k]+(nyk[k]-1)*nxk[k]]+
-        //                                                u[level[k]+i*nxk[k]*nyk[k]+(nyk[k]-1)*nxk[k]+1]+
-        //                                                u[level[k]+i*nxk[k]*nyk[k]+(nyk[k]-2)*nxk[k]]+
-        //                                                u[level[k]+(i+1)*nxk[k]*nyk[k]+(nyk[k]-1)*nxk[k]]+
-        //                                                u[level[k]+(i-1)*nxk[k]*nyk[k]+(nyk[k]-1)*nxk[k]];
-        //for (h = 1; h < nxk[k]-1; h++) {
-        //    r[level[k]+i*nxk[k]*nyk[k]+(nyk[k]-1)*nxk[k]+h] = b[level[k]+i*nxk[k]*nyk[k]+(nyk[k]-1)*nxk[k]+h]-
-        //                                                      6*u[level[k]+i*nxk[k]*nyk[k]+(nyk[k]-1)*nxk[k]+h]+
-        //                                                      u[level[k]+i*nxk[k]*nyk[k]+(nyk[k]-1)*nxk[k]+h+1]+
-        //                                                      u[level[k]+i*nxk[k]*nyk[k]+(nyk[k]-1)*nxk[k]+h-1]+
-        //                                                      u[level[k]+i*nxk[k]*nyk[k]+(nyk[k]-2)*nxk[k]+h]+
-        //                                                      u[level[k]+(i+1)*nxk[k]*nyk[k]+(nyk[k]-1)*nxk[k]+h]+
-        //                                                      u[level[k]+(i-1)*nxk[k]*nyk[k]+(nyk[k]-1)*nxk[k]+h];
-        //}
-        //r[level[k]+i*nxk[k]*nyk[k]+nyk[k]*nxk[k]-1] = b[level[k]+i*nxk[k]*nyk[k]+nyk[k]*nxk[k]-1]-
-        //                                              6*u[level[k]+i*nxk[k]*nyk[k]+nyk[k]*nxk[k]-1]+
-        //                                              u[level[k]+i*nxk[k]*nyk[k]+nyk[k]*nxk[k]-2]+
-        //                                              u[level[k]+i*nxk[k]*nyk[k]+(nyk[k]-1)*nxk[k]-1]+
-        //                                              u[level[k]+(i+1)*nxk[k]*nyk[k]+nyk[k]*nxk[k]-1]+
-        //                                              u[level[k]+(i-1)*nxk[k]*nyk[k]+nyk[k]*nxk[k]-1];
-    }
-
-    //// top plane
-    //r[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]] = b[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]]-
-    //                                       6*u[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]]+
-    //                                       u[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+1]+
-    //                                       u[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+nxk[k]]+
-    //                                       u[level[k]+(nzk[k]-2)*nxk[k]*nyk[k]];
-    //for (h = 1; h < nxk[k]-1; h++) {
-    //    r[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+h] = b[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+h]-
-    //                                             6*u[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+h]+
-    //                                             u[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+h+1]+
-    //                                             u[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+h-1]+
-    //                                             u[level[k]+(nzk[k]-2)*nxk[k]*nyk[k]+h]+
-    //                                             u[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+h+nxk[k]];
-    //}
-    //r[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+nxk[k]-1] = b[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+nxk[k]-1]-
-    //                                                6*u[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+nxk[k]-1]+
-    //                                                u[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+nxk[k]-2]+
-    //                                                u[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+2*nxk[k]-1]+
-    //                                                u[level[k]+(nzk[k]-2)*nxk[k]*nyk[k]+nxk[k]-1];
-    //for (j = 1; j < nyk[k]-1; j++) {
-    //    r[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+j*nxk[k]] = b[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+j*nxk[k]]-
-    //                                                    6*u[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+j*nxk[k]]+
-    //                                                    u[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+j*nxk[k]+1]+
-    //                                                    u[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+(j+1)*nxk[k]]+
-    //                                                    u[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+(j-1)*nxk[k]]+
-    //                                                    u[level[k]+(nzk[k]-2)*nxk[k]*nyk[k]+j*nxk[k]];
-    //    for (h = 1; h < nxk[k]-1; h++) {
-    //        r[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+j*nxk[k]+h] = b[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+j*nxk[k]+h]-
-    //                                                          6*u[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+j*nxk[k]+h]+
-    //                                                          u[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+j*nxk[k]+h+1]+
-    //                                                          u[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+j*nxk[k]+h-1]+
-    //                                                          u[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+(j+1)*nxk[k]+h]+
-    //                                                          u[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]+(j-1)*nxk[k]+h]+
-    //                                                          u[level[k]+(nzk[k]-2)*nxk[k]*nyk[k]+j*nxk[k]+h];
-    //    }
-    //    r[level[k]+((nzk[k]-1)*nyk[k]+j+1)*nxk[k]-1] = b[level[k]+((nzk[k]-1)*nyk[k]+j+1)*nxk[k]-1]-
-    //                                                   6*u[level[k]+((nzk[k]-1)*nyk[k]+j+1)*nxk[k]-1]+
-    //                                                   u[level[k]+((nzk[k]-1)*nyk[k]+j+1)*nxk[k]-2]+
-    //                                                   u[level[k]+((nzk[k]-1)*nyk[k]+j+2)*nxk[k]-1]+
-    //                                                   u[level[k]+((nzk[k]-1)*nyk[k]+j)*nxk[k]-1]+
-    //                                                   u[level[k]+((nzk[k]-2)*nyk[k]+j+1)*nxk[k]-1];
-    //}
-    //r[level[k]+nzk[k]*nxk[k]*nyk[k]-nxk[k]] = b[level[k]+nzk[k]*nxk[k]*nyk[k]-nxk[k]]-
-    //                                          6*u[level[k]+nzk[k]*nxk[k]*nyk[k]-nxk[k]]+
-    //                                          u[level[k]+nzk[k]*nxk[k]*nyk[k]-nxk[k]+1]+
-    //                                          u[level[k]+nzk[k]*nxk[k]*nyk[k]-2*nxk[k]]+
-    //                                          u[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]-nxk[k]];
-    //for (h = 1; h < nxk[k]-1; h++) {
-    //    r[level[k]+nzk[k]*nxk[k]*nyk[k]-nxk[k]+h] = b[level[k]+nzk[k]*nxk[k]*nyk[k]-nxk[k]+h]-
-    //                                                6*u[level[k]+nzk[k]*nxk[k]*nyk[k]-nxk[k]+h]+
-    //                                                u[level[k]+nzk[k]*nxk[k]*nyk[k]-nxk[k]+h+1]+
-    //                                                u[level[k]+nzk[k]*nxk[k]*nyk[k]-nxk[k]+h-1]+
-    //                                                u[level[k]+nzk[k]*nxk[k]*nyk[k]-2*nxk[k]+h]+
-    //                                                u[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]-nxk[k]+h];
-    //}
-    //r[level[k]+nzk[k]*nxk[k]*nyk[k]-1] = b[level[k]+nzk[k]*nxk[k]*nyk[k]-1]-
-    //                                     6*u[level[k]+nzk[k]*nxk[k]*nyk[k]-1]+
-    //                                     u[level[k]+nzk[k]*nxk[k]*nyk[k]-2]+
-    //                                     u[level[k]+nzk[k]*nxk[k]*nyk[k]-1-nxk[k]]+
-    //                                     u[level[k]+(nzk[k]-1)*nxk[k]*nyk[k]-1];
+	}
 }    
 
 
